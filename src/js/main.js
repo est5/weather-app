@@ -1,8 +1,16 @@
 import Day from './model';
 
 const API = '85b84c5130087fb07ff265a3876b3a1d';
+const city = document.getElementById('city');
+const btn = document.getElementById('ok');
+const sel = document.getElementById('unit');
+
 async function getWeekWeather(city, units) {
   const geo = await getGeo(city);
+  let unit = '°C';
+  if (units === 'imperial') {
+    unit = '°F';
+  }
 
   try {
     const fetchData = await fetch(
@@ -10,9 +18,9 @@ async function getWeekWeather(city, units) {
     );
     const data = await fetchData.json();
 
-    createWeekWeather(data.daily);
+    createWeekWeather(data.daily, unit);
   } catch (e) {
-    console.log(e);
+    return;
   }
 }
 
@@ -29,11 +37,11 @@ async function getGeo(city) {
 
     return { lat, lon };
   } catch (e) {
-    console.log(e);
+    return;
   }
 }
 
-function createWeekWeather(data) {
+function createWeekWeather(data, unit) {
   const week = [];
 
   for (let i = 0; i < data.length; i++) {
@@ -41,9 +49,8 @@ function createWeekWeather(data) {
     const feels = data[i].feels_like;
     const temp = data[i].temp;
     const weather = data[i].weather;
-    const d = new Day(date, feels, temp, weather);
+    const d = new Day(date, feels, temp, weather, unit);
     week.push(d);
-    console.log(d.getDayNigthTemp());
   }
 
   displayWeek(week);
@@ -78,12 +85,13 @@ function createParagraph() {
 
 function createDatePara(date) {
   const p = createParagraph();
-  p.textContent = 'Date: ' + date;
+  p.textContent = 'Day: ' + date;
   return p;
 }
 
 function createWeatherPara(weather) {
   const p = createParagraph();
+  p.textContent = 'Weather: ';
   p.textContent += weather;
   return p;
 }
@@ -94,12 +102,21 @@ function createTemp(temp, feels = false) {
 
   if (feels) {
     p.textContent = 'Feels like: \n';
-    p.textContent += 'Day: ' + day + ' Night: ' + night;
+    p.textContent += 'Day ' + day + ', Night ' + night;
     return p;
   }
 
-  p.textContent = 'Day: ' + day + ' Night: ' + night;
+  p.textContent = 'Temperature: ';
+  p.textContent += 'Day ' + day + ', Night ' + night;
   return p;
 }
+getWeekWeather(city.value, sel.value);
 
-getWeekWeather('london', 'metric');
+btn.addEventListener('click', async () => {
+  const remove = document.querySelectorAll('.day-wrapper');
+  remove.forEach((r) => {
+    r.remove();
+  });
+
+  await getWeekWeather(city.value, sel.value);
+});

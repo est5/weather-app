@@ -1,9 +1,10 @@
 export default class Day {
-  constructor(date, feels, temp, weather) {
+  constructor(date, feels, temp, weather, unit = '°C') {
     this.date = new Date(date * 1000).toLocaleDateString();
     this.feelsLike = feels;
     this.temp = temp;
     this.weather = weather;
+    this.unit = unit;
   }
 
   getWeather() {
@@ -11,10 +12,14 @@ export default class Day {
   }
 
   getDayNigthTemp() {
-    return [Math.round(this.temp.day), Math.round(this.temp.night)];
+    const day = Math.round(this.temp.day) + this.unit;
+    const night = Math.round(this.temp.night) + this.unit;
+    return [day, night];
   }
 
   getFeelsLikeDayNightTemp() {
-    return [Math.round(this.feelsLike.day), Math.round(this.feelsLike.night)];
+    const day = Math.round(this.feelsLike.day) + this.unit;
+    const night = Math.round(this.feelsLike.night) + this.unit;
+    return [day, night];
   }
 }
